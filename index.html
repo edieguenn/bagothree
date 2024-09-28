@@ -198,13 +198,12 @@
     }
 
     function addNewCage() {
-        addedCageCount++;
-        const newCageId = `newCage${addedCageCount}`;
-        totalCages++;
+        totalCages++;  // Increment total cage count for new cages
+        const newCageId = totalCages;  // Use totalCages as the new unique ID for each cage
         
         const cageButton = document.createElement('button');
-        cageButton.textContent = `CAGE ${totalCages} (ID: ${newCageId})`;
-        cageButton.setAttribute('data-id', newCageId);  // Assign unique ID to new cage
+        cageButton.textContent = `CAGE ${newCageId}`;
+        cageButton.setAttribute('data-id', newCageId);  // Assign unique ID to the new cage
         cageButton.onclick = function() { showCageDetails(newCageId); };
         
         document.getElementById('cageButtons').appendChild(cageButton);
@@ -229,7 +228,7 @@
         for (let i = 1; i <= totalCages; i++) {
             const cageButton = document.createElement('button');
             cageButton.textContent = `CAGE ${i}`;
-            cageButton.setAttribute('data-id', i);  // Ensure all default cages have data-id
+            cageButton.setAttribute('data-id', i);  // Ensure all cages have a unique data-id
             cageButton.onclick = function() { showCageDetails(i); };
             cageButtons.appendChild(cageButton);
         }
