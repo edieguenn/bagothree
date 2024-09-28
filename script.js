@@ -1,6 +1,7 @@
 let totalCages = JSON.parse(localStorage.getItem('totalCages')) || 6;
 let addedCageCount = JSON.parse(localStorage.getItem('addedCageCount')) || 0;
-let nextCageId = JSON.parse(localStorage.getItem('nextCageId')) || 7;  // To keep track of unique cage IDs
+let nextCageId = JSON.parse(localStorage.getItem('nextCageId')) || 7;
+let cages = JSON.parse(localStorage.getItem('cages')) || {}; // Track cages with their unique IDs
 
 function goHome() {
     document.getElementById('homePage').style.display = 'block';
@@ -20,10 +21,13 @@ function showCageDetails(cageNumber) {
 }
 
 function addNewCage() {
-    const newCageId = nextCageId;  // Use nextCageId as the new unique ID for each cage
+    const newCageId = nextCageId;
     totalCages++;
     addedCageCount++;
-    nextCageId++;  // Increment nextCageId for future unique cages
+    nextCageId++;
+    
+    // Add to the cages object for tracking
+    cages[newCageId] = true;
 
     const cageButton = document.createElement('button');
     cageButton.textContent = `CAGE ${newCageId}`;
@@ -32,10 +36,11 @@ function addNewCage() {
 
     document.getElementById('cageButtons').appendChild(cageButton);
 
-    // Persist total cages, added cage count, and next unique ID
+    // Persist data
     localStorage.setItem('totalCages', JSON.stringify(totalCages));
     localStorage.setItem('addedCageCount', JSON.stringify(addedCageCount));
     localStorage.setItem('nextCageId', JSON.stringify(nextCageId));
+    localStorage.setItem('cages', JSON.stringify(cages));
 }
 
 function deleteCage() {
@@ -48,13 +53,18 @@ function deleteCage() {
             buttonToDelete.remove();
         }
 
-        // Only decrement totalCages if the deleted cage is dynamically added
-        if (parseInt(cageNumber) > 6) {
-            totalCages--;
-            addedCageCount--;
-            localStorage.setItem('totalCages', JSON.stringify(totalCages));
-            localStorage.setItem('addedCageCount', JSON.stringify(addedCageCount));
+        // Remove the cage from tracking and localStorage
+        if (cages[cageNumber]) {
+            delete cages[cageNumber];
+            if (parseInt(cageNumber) > 6) {
+                totalCages--;
+                addedCageCount--;
+            }
         }
+
+        localStorage.setItem('totalCages', JSON.stringify(totalCages));
+        localStorage.setItem('addedCageCount', JSON.stringify(addedCageCount));
+        localStorage.setItem('cages', JSON.stringify(cages));
 
         alert(`CAGE ${cageNumber} deleted.`);
         goHome();
@@ -64,7 +74,8 @@ function deleteCage() {
 function updateCageList() {
     const cageButtons = document.getElementById('cageButtons');
     cageButtons.innerHTML = '';
-    for (let i = 1; i <= totalCages; i++) {
+
+    for (let i in cages) {
         const cageButton = document.createElement('button');
         cageButton.textContent = `CAGE ${i}`;
         cageButton.setAttribute('data-id', i);
