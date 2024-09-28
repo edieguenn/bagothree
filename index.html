@@ -193,27 +193,25 @@
     function updateCageList() {
         const cageButtonsDiv = document.getElementById('cageButtons');
         cageButtonsDiv.innerHTML = ''; 
-        const sortedCages = Object.keys(cages).sort((a, b) => Number(a) - Number(b)); // Sort cages numerically
+        const sortedCages = Object.keys(cages).sort((a, b) => a - b); 
         sortedCages.forEach(cageId => {
-            createCageButton(cageId);
+            const button = document.createElement('button');
+            button.innerText = `Cage ${cageId}`;
+            button.onclick = () => showCageDetails(cageId);
+            cageButtonsDiv.appendChild(button);
         });
     }
 
-    function createCageButton(cageId) {
-        const button = document.createElement('button');
-        button.textContent = `CAGE ${cageId}`;
-        button.onclick = () => showCageDetails(cageId);
-        document.getElementById('cageButtons').appendChild(button);
-    }
-
     function deleteCage() {
-        const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
-        delete cages[cageNumber]; 
-        localStorage.setItem('cages', JSON.stringify(cages)); 
-        alert(`Cage ${cageNumber} deleted successfully!`);
-        renumberCages(); // Renumber cages after deletion
-        updateCageList(); 
-        goHome(); 
+        const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber; // Get the current cage number
+        if (confirm(`Are you sure you want to delete Cage ${cageNumber}?`)) {
+            delete cages[cageNumber]; 
+            localStorage.setItem('cages', JSON.stringify(cages)); 
+            alert(`Cage ${cageNumber} deleted successfully!`);
+            renumberCages(); // Renumber cages after deletion
+            updateCageList(); 
+            goHome(); 
+        }
     }
 
     function renumberCages() {
@@ -224,6 +222,17 @@
         });
         cages = newCages; // Update the cages reference
         localStorage.setItem('cages', JSON.stringify(cages)); // Update localStorage
+        // Update the displayed cage number in the form if the deleted cage is still in view
+        const currentCageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
+        if (!cages[currentCageNumber]) {
+            // If the current cage is deleted, show the first available cage
+            if (Object.keys(cages).length > 0) {
+                const firstCageNumber = Object.keys(cages)[0]; // Get the first available cage
+                showCageDetails(firstCageNumber);
+            } else {
+                goHome(); // Go back to home if no cages left
+            }
+        }
     }
 </script>
 </body>
