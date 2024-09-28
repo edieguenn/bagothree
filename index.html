@@ -102,7 +102,7 @@
 
 <script>
     let totalCages = 6; // Keeps track of the total number of cages
-    let addedCages = []; // To track dynamically added cages
+    let addedCages = JSON.parse(localStorage.getItem('addedCages')) || []; // To track dynamically added cages
 
     function goHome() {
         document.getElementById('homePage').style.display = 'block';
@@ -110,6 +110,7 @@
         document.getElementById('pregnancyOption').style.display = 'none';
         document.getElementById('pregnancyDetails').style.display = 'none';
         document.getElementById('headerTitle').innerHTML = '<strong>RABBIT CAGE</strong>'; // Reset header title
+        updateCageList(); // Make sure to update the cage list
     }
 
     function showCageDetails(cageNumber) {
@@ -199,6 +200,7 @@
                 const buttons = document.querySelectorAll('#homePage button');
                 buttons[buttons.length - 2].remove(); // The second last button is always the new cage
                 addedCages.splice(index, 1); // Remove it from addedCages list
+                localStorage.setItem('addedCages', JSON.stringify(addedCages)); // Update localStorage
             }
 
             alert(`Cage ${cageNumber} has been deleted.`);
@@ -210,12 +212,29 @@
     function addNewCage() {
         totalCages++;
         addedCages.push(totalCages); // Track added cages
+        localStorage.setItem('addedCages', JSON.stringify(addedCages)); // Save to localStorage
 
         const homePage = document.getElementById('homePage');
         const newCageButton = document.createElement('button');
         newCageButton.textContent = `CAGE ${totalCages}`;
         newCageButton.onclick = () => showCageDetails(totalCages);
         homePage.insertBefore(newCageButton, homePage.lastElementChild);
+    }
+
+    // Function to restore added cages from localStorage
+    function restoreAddedCages() {
+        addedCages.forEach(cageNumber => {
+            const homePage = document.getElementById('homePage');
+            const newCageButton = document.createElement('button');
+            newCageButton.textContent = `CAGE ${cageNumber}`;
+            newCageButton.onclick = () => showCageDetails(cageNumber);
+            homePage.insertBefore(newCageButton, homePage.lastElementChild);
+        });
+    }
+
+    function updateCageList() {
+        // Restore dynamically added cages
+        restoreAddedCages();
     }
 
     window.onload = function () {
