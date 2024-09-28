@@ -186,71 +186,35 @@
 
     function addNewCage() {
         const newCageId = nextCageId;  // Generate a unique ID for the new cage
-        totalCages++;
-        addedCageCount++;
-        nextCageId++;
-        localStorage.setItem('totalCages', totalCages);
-        localStorage.setItem('addedCageCount', addedCageCount);
-        localStorage.setItem('nextCageId', nextCageId);
         cages[newCageId] = {}; // Initialize the new cage in storage
         localStorage.setItem('cages', JSON.stringify(cages)); // Store cages object
-        createCageButton(newCageId);
-        updateCageList();
-    }
-
-    function createCageButton(cageNumber) {
-        const button = document.createElement('button');
-        button.innerText = `CAGE ${cageNumber}`;
-        button.onclick = () => showCageDetails(cageNumber);
-        document.getElementById('cageButtons').appendChild(button);
+        nextCageId++; // Increment nextCageId for the next addition
+        localStorage.setItem('nextCageId', nextCageId); // Update localStorage
+        updateCageList(); // Update the cage list immediately after adding
     }
 
     function updateCageList() {
         const cageButtonsDiv = document.getElementById('cageButtons');
         cageButtonsDiv.innerHTML = ''; // Clear previous buttons
-        for (let i = 1; i <= totalCages; i++) {
-            if (cages[i]) {
-                createCageButton(i);
-            }
-        }
+        Object.keys(cages).forEach(cageId => {
+            createCageButton(cageId);
+        });
+    }
+
+    function createCageButton(cageId) {
+        const button = document.createElement('button');
+        button.textContent = `CAGE ${cageId}`;
+        button.onclick = () => showCageDetails(cageId);
+        document.getElementById('cageButtons').appendChild(button);
     }
 
     function deleteCage() {
         const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
-        if (confirm(`Are you sure you want to delete CAGE ${cageNumber}?`)) {
-            delete cages[cageNumber];
-            localStorage.setItem('cages', JSON.stringify(cages));
-            totalCages--;
-            localStorage.setItem('totalCages', totalCages);
-            alert(`CAGE ${cageNumber} has been deleted.`);
-            renumberCages(); // Renumber cages after deletion
-            goHome();
-        }
-    }
-
-    function renumberCages() {
-        const newCages = {};
-        let newCageCount = 0;
-        for (let i = 1; i <= nextCageId; i++) {
-            if (cages[i]) {
-                newCageCount++;
-                newCages[newCageCount] = cages[i]; // Assign old cage data to new number
-            }
-        }
-        cages = newCages; // Update the cages to the new numbering
-        localStorage.setItem('cages', JSON.stringify(cages)); // Store updated cages
-        totalCages = newCageCount; // Update totalCages to the new count
-        localStorage.setItem('totalCages', totalCages); // Store updated totalCages
-        // Recreate the cage buttons
-        updateCageList();
-    }
-
-    window.onload = function() {
-        if (addedCageCount === 0) {
-            addNewCage(); // Create the initial cage if none exists
-        } else {
-            updateCageList(); // Update the list of cages if they exist
-        }
+        delete cages[cageNumber]; // Remove the cage from storage
+        localStorage.setItem('cages', JSON.stringify(cages)); // Update localStorage
+        alert(`Cage ${cageNumber} deleted successfully!`);
+        updateCageList(); // Refresh the list of cages
+        goHome(); // Return to home
     }
 </script>
 </body>
