@@ -1,7 +1,7 @@
 let totalCages = JSON.parse(localStorage.getItem('totalCages')) || 6;
 let addedCageCount = JSON.parse(localStorage.getItem('addedCageCount')) || 0;
 let nextCageId = JSON.parse(localStorage.getItem('nextCageId')) || 7;
-let cages = JSON.parse(localStorage.getItem('cages')) || {}; // Track cages with their unique IDs
+let cages = JSON.parse(localStorage.getItem('cages')) || {}; // Store dynamically added cages
 
 function goHome() {
     document.getElementById('homePage').style.display = 'block';
@@ -21,12 +21,12 @@ function showCageDetails(cageNumber) {
 }
 
 function addNewCage() {
-    const newCageId = nextCageId;
+    const newCageId = nextCageId;  // Generate a unique ID for the new cage
     totalCages++;
     addedCageCount++;
     nextCageId++;
     
-    // Add to the cages object for tracking
+    // Store the new cage in the `cages` object
     cages[newCageId] = true;
 
     const cageButton = document.createElement('button');
@@ -46,6 +46,7 @@ function addNewCage() {
 function deleteCage() {
     const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
     if (confirm(`Are you sure you want to delete CAGE ${cageNumber}?`)) {
+        // Remove the cage data and the button
         localStorage.removeItem(`rabbitData${cageNumber}`);
 
         const buttonToDelete = document.querySelector(`button[data-id="${cageNumber}"]`);
@@ -53,7 +54,7 @@ function deleteCage() {
             buttonToDelete.remove();
         }
 
-        // Remove the cage from tracking and localStorage
+        // Check if the cage is dynamically added and remove it from the cages object
         if (cages[cageNumber]) {
             delete cages[cageNumber];
             if (parseInt(cageNumber) > 6) {
@@ -62,6 +63,7 @@ function deleteCage() {
             }
         }
 
+        // Update localStorage with the removed cage
         localStorage.setItem('totalCages', JSON.stringify(totalCages));
         localStorage.setItem('addedCageCount', JSON.stringify(addedCageCount));
         localStorage.setItem('cages', JSON.stringify(cages));
@@ -73,14 +75,26 @@ function deleteCage() {
 
 function updateCageList() {
     const cageButtons = document.getElementById('cageButtons');
-    cageButtons.innerHTML = '';
+    cageButtons.innerHTML = ''; // Clear the current list
 
-    for (let i in cages) {
+    // First, load the static cages (1-6)
+    for (let i = 1; i <= 6; i++) {
         const cageButton = document.createElement('button');
         cageButton.textContent = `CAGE ${i}`;
         cageButton.setAttribute('data-id', i);
         cageButton.onclick = function() { showCageDetails(i); };
         cageButtons.appendChild(cageButton);
+    }
+
+    // Now, load the dynamically added cages
+    for (let id in cages) {
+        if (cages[id]) {
+            const cageButton = document.createElement('button');
+            cageButton.textContent = `CAGE ${id}`;
+            cageButton.setAttribute('data-id', id);
+            cageButton.onclick = function() { showCageDetails(id); };
+            cageButtons.appendChild(cageButton);
+        }
     }
 }
 
