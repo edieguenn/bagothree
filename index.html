@@ -239,6 +239,8 @@
         }
         cages = newCages; // Update the cages to the new numbering
         localStorage.setItem('cages', JSON.stringify(cages)); // Store updated cages
+        totalCages = newCageCount; // Update totalCages to the new count
+        localStorage.setItem('totalCages', totalCages); // Store updated totalCages
         // Recreate the cage buttons
         updateCageList();
     }
