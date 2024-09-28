@@ -15,7 +15,7 @@ function goHome() {
 function showCageDetails(cageNumber) {
     document.getElementById('homePage').style.display = 'none';
     document.getElementById('cageDetails').style.display = 'block';
-    loadData(cageNumber);
+    loadData(cageNumber); // Ensure this function loads the correct data for the cage
     document.getElementById('rabbitForm').dataset.cageNumber = cageNumber;
     document.getElementById('headerTitle').innerHTML = `<strong>CAGE ${cageNumber}</strong>`;
 }
@@ -36,11 +36,11 @@ function addNewCage() {
 
     document.getElementById('cageButtons').appendChild(cageButton);
 
-    // Persist data
+    // Persist data to localStorage
     localStorage.setItem('totalCages', JSON.stringify(totalCages));
     localStorage.setItem('addedCageCount', JSON.stringify(addedCageCount));
     localStorage.setItem('nextCageId', JSON.stringify(nextCageId));
-    localStorage.setItem('cages', JSON.stringify(cages));
+    localStorage.setItem('cages', JSON.stringify(cages)); // Save cages object with new cage
 }
 
 function deleteCage() {
@@ -86,7 +86,7 @@ function updateCageList() {
         cageButtons.appendChild(cageButton);
     }
 
-    // Now, load the dynamically added cages
+    // Now, load the dynamically added cages from the `cages` object
     for (let id in cages) {
         if (cages[id]) {
             const cageButton = document.createElement('button');
