@@ -36,21 +36,18 @@
                 <input type="text" id="weight" name="weight">
             </div>
 
-            <!-- Gender Section -->
             <div>
                 <label for="gender">GENDER:</label>
                 <label><input type="radio" name="gender" value="male" onclick="togglePregnancy(false)"> MALE</label>
                 <label><input type="radio" name="gender" value="female" onclick="togglePregnancy(true)"> FEMALE</label>
             </div>
 
-            <!-- Pregnant Option (only for Female) -->
             <div id="pregnancyOption" style="display: none;">
                 <label>PREGNANT:</label>
                 <label><input type="radio" name="pregnant" value="yes" onclick="togglePregnancyDetails(true)"> YES</label>
                 <label><input type="radio" name="pregnant" value="no" onclick="togglePregnancyDetails(false)"> NO</label>
             </div>
 
-            <!-- Pregnancy Details (shown if Pregnant is Yes) -->
             <div id="pregnancyDetails" style="display: none;">
                 <div>
                     <label for="matedRabbit">MATED RABBIT:</label>
@@ -66,7 +63,6 @@
                 </div>
             </div>
 
-            <!-- Other Fields -->
             <div>
                 <label for="foodIntake">FOOD INTAKE:</label>
                 <label><input type="radio" name="foodIntake" value="normal"> NORMAL</label>
@@ -91,14 +87,12 @@
     </div>
 
     <div id="homePage" class="cage-list" style="display: none;">
-        <div id="cageButtons"></div> <!-- Dynamic buttons for cages will be appended here -->
+        <div id="cageButtons"></div> 
         <button onclick="addNewCage()">ADD NEW CAGE</button>
     </div>
 
 <script>
     let totalCages = JSON.parse(localStorage.getItem('totalCages')) || 6;
-    let addedCageCount = JSON.parse(localStorage.getItem('addedCageCount')) || 0;
-    let nextCageId = JSON.parse(localStorage.getItem('nextCageId')) || 7;
     let cages = JSON.parse(localStorage.getItem('cages')) || {}; // Store dynamically added cages
 
     function goHome() {
@@ -113,14 +107,14 @@
     function showCageDetails(cageNumber) {
         document.getElementById('homePage').style.display = 'none';
         document.getElementById('cageDetails').style.display = 'block';
-        loadData(cageNumber); // Load the data for the selected cage
+        loadData(cageNumber); 
         document.getElementById('rabbitForm').dataset.cageNumber = cageNumber;
         document.getElementById('headerTitle').innerHTML = `<strong>CAGE ${cageNumber}</strong>`;
     }
 
     function togglePregnancy(show) {
         document.getElementById('pregnancyOption').style.display = show ? 'block' : 'none';
-        document.getElementById('pregnancyDetails').style.display = 'none'; // Hide pregnancy details if gender changes
+        document.getElementById('pregnancyDetails').style.display = 'none'; 
     }
 
     function togglePregnancyDetails(show) {
@@ -185,18 +179,19 @@
     }
 
     function addNewCage() {
-        const newCageId = nextCageId;  // Generate a unique ID for the new cage
-        cages[newCageId] = {}; // Initialize the new cage in storage
-        localStorage.setItem('cages', JSON.stringify(cages)); // Store cages object
-        nextCageId++; // Increment nextCageId for the next addition
-        localStorage.setItem('nextCageId', nextCageId); // Update localStorage
-        updateCageList(); // Update the cage list immediately after adding
+        let newCageId = Object.keys(cages).length > 0 ? Math.max(...Object.keys(cages).map(Number)) + 1 : 1; // Determine the next cage ID
+        cages[newCageId] = {}; 
+        localStorage.setItem('cages', JSON.stringify(cages)); 
+        updateCageList(); 
+        document.getElementById('headerTitle').innerHTML = `<strong>CAGE ${newCageId}</strong>`; // Update the header
+        showCageDetails(newCageId); // Show the new cage details immediately
     }
 
     function updateCageList() {
         const cageButtonsDiv = document.getElementById('cageButtons');
-        cageButtonsDiv.innerHTML = ''; // Clear previous buttons
-        Object.keys(cages).forEach(cageId => {
+        cageButtonsDiv.innerHTML = ''; 
+        const sortedCages = Object.keys(cages).sort((a, b) => Number(a) - Number(b)); // Sort cages numerically
+        sortedCages.forEach(cageId => {
             createCageButton(cageId);
         });
     }
@@ -210,11 +205,22 @@
 
     function deleteCage() {
         const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
-        delete cages[cageNumber]; // Remove the cage from storage
-        localStorage.setItem('cages', JSON.stringify(cages)); // Update localStorage
+        delete cages[cageNumber]; 
+        localStorage.setItem('cages', JSON.stringify(cages)); 
         alert(`Cage ${cageNumber} deleted successfully!`);
-        updateCageList(); // Refresh the list of cages
-        goHome(); // Return to home
+        renumberCages(); // Renumber cages after deletion
+        updateCageList(); 
+        goHome(); 
+    }
+
+    function renumberCages() {
+        let newCages = {};
+        let newId = 1;
+        Object.keys(cages).sort((a, b) => Number(a) - Number(b)).forEach(oldId => {
+            newCages[newId++] = cages[oldId]; // Assign new IDs starting from 1
+        });
+        cages = newCages; // Update the cages reference
+        localStorage.setItem('cages', JSON.stringify(cages)); // Update localStorage
     }
 </script>
 </body>
