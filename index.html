@@ -85,7 +85,7 @@
             <div class="buttons">
                 <button type="submit">SUBMIT</button>
                 <button type="button" onclick="goHome()">CANCEL</button>
-                <button type="button" onclick="deleteCage()">DELETE CAGE</button> <!-- Delete Cage Button -->
+                <button type="button" onclick="clearForm()">CLEAR FORM</button> <!-- Renamed Button -->
             </div>
         </form>
     </div>
@@ -186,22 +186,10 @@
         window.location.href = `rabbitinfo.html?cage=${cageNumber}&${params.toString()}`;
     }
 
-    // Updated deleteCage function
-    function deleteCage() {
-        const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
-        if (confirm(`Are you sure you want to delete Cage ${cageNumber}? This will delete all data for this cage.`)) {
-            localStorage.removeItem(`rabbitData${cageNumber}`);
-
-            // Remove the cage button from the homepage (if dynamically added)
-            const index = addedCages.indexOf(parseInt(cageNumber));
-            if (index !== -1) {
-                const buttons = document.querySelectorAll('#homePage button');
-                buttons[buttons.length - 1].remove(); // Remove the last added cage button
-                addedCages.splice(index, 1); // Remove it from the addedCages list
-            }
-
-            alert(`Cage ${cageNumber} has been deleted.`);
-            goHome();
+    // Clear Form function
+    function clearForm() {
+        if (confirm('Are you sure you want to clear the form? This will reset all fields.')) {
+            document.getElementById('rabbitForm').reset();
         }
     }
 
