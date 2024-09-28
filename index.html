@@ -215,10 +215,36 @@
             localStorage.setItem('addedCageCount', JSON.stringify(addedCageCount));
             localStorage.setItem('cages', JSON.stringify(cages));
             alert(`Cage ${cageNumber} deleted successfully.`);
+
+            // Renumber cages to maintain sequence
+            renumberCages();
+
             goHome(); // Go back to home
         } else {
             alert('Cage cannot be deleted.');
         }
+    }
+
+    function renumberCages() {
+        let newCages = {};
+        let newId = 7; // Start renumbering from 7 (next available ID)
+        
+        // Keep cages with IDs 1 to 6
+        for (let i = 1; i <= 6; i++) {
+            newCages[i] = true; // Preserve existing cages
+        }
+
+        // Renumber dynamically added cages
+        Object.keys(cages).forEach(() => {
+            if (newId in cages) {
+                newId++;
+            }
+            newCages[newId] = true; // Assign new ID
+            newId++;
+        });
+
+        cages = newCages; // Update cages with renumbered IDs
+        localStorage.setItem('cages', JSON.stringify(cages)); // Store the updated cages
     }
 
     function updateCageList() {
