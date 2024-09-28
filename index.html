@@ -19,6 +19,7 @@
             <div>
                 <label for="serialNumber">SERIAL NUMBER:</label>
                 <input type="text" id="serialNumber" name="serialNumber" required>
+                <button type="button" onclick="readNfcTag()">Read NFC</button> <!-- NFC button -->
             </div>
             <div>
                 <label for="breed">BREED:</label>
@@ -108,6 +109,25 @@
     let totalCages = 6;
     let addedCages = [];
 
+    // NFC tag reading function
+    function readNfcTag() {
+        if ("NDEFReader" in window) {
+            const reader = new NDEFReader();
+            reader.scan().then(() => {
+                reader.onreading = event => {
+                    const serial = event.serialNumber;
+                    document.getElementById("serialNumber").value = serial; // Automatically fill serialNumber field
+                    alert(`NFC Tag Read: ${serial}`);
+                };
+            }).catch(error => {
+                console.error("Error reading NFC tag:", error);
+                alert("Error reading NFC tag.");
+            });
+        } else {
+            alert("NFC is not supported by this browser.");
+        }
+    }
+
     function goHome() {
         document.getElementById('homePage').style.display = 'block';
         document.getElementById('cageDetails').style.display = 'none';
@@ -176,65 +196,4 @@
         document.getElementById('pregnancyStart').value = data.pregnancyStart || '';
         document.getElementById('dueDate').value = data.dueDate || '';
         document.querySelector(`input[name="foodIntake"][value="${data.foodIntake || 'normal'}"]`).checked = true;
-        document.querySelector(`input[name="mating"][value="${data.mating || 'no'}"]`).checked = true;
-        document.getElementById('note').value = data.note || '';
-    }
-
-    function goToRabbitProfile() {
-        const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber || 1;
-        const form = document.getElementById('rabbitForm');
-        const data = new FormData(form);
-        const params = new URLSearchParams();
-        data.forEach((value, key) => {
-            params.append(key, value);
-        });
-        window.location.href = `rabbitinfo.html?cage=${cageNumber}&${params.toString()}`;
-    }
-
-    function clearForm() {
-        if (confirm('Are you sure you want to clear the form? This will reset all fields.')) {
-            document.getElementById('rabbitForm').reset();
-        }
-    }
-
-    function addNewCage() {
-        totalCages++;
-        const cageButton = document.createElement('button');
-        cageButton.textContent = `CAGE ${totalCages}`;
-        cageButton.onclick = function() { showCageDetails(totalCages); };
-        document.getElementById('cageButtons').appendChild(cageButton);
-        addedCages.push(totalCages);
-    }
-
-    function deleteCage() {
-        const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
-        if (confirm(`Are you sure you want to delete CAGE ${cageNumber}?`)) {
-            localStorage.removeItem(`rabbitData${cageNumber}`);
-            alert(`CAGE ${cageNumber} deleted.`);
-            goHome();
-        }
-    }
-
-    function updateCageList() {
-        // Update the list of cages based on dynamically added cages
-        const cageButtons = document.getElementById('cageButtons');
-        cageButtons.innerHTML = '';
-        for (let i = 1; i <= totalCages; i++) {
-            const cageButton = document.createElement('button');
-            cageButton.textContent = `CAGE ${i}`;
-            cageButton.onclick = function() { showCageDetails(i); };
-            cageButtons.appendChild(cageButton);
-        }
-    }
-
-    window.onload = function () {
-        let cageNumber = new URLSearchParams(window.location.search).get('cage');
-        if (cageNumber) {
-            showCageDetails(cageNumber);
-        } else {
-            goHome();
-        }
-    }
-</script>
-</body>
-</html>
+       
