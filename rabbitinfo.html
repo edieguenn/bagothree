@@ -94,9 +94,9 @@
             cursor: pointer;
         }
 
-        /* New image upload styling */
-        .upload-image {
-            margin-top: 10px;
+        /* Style for capitalizing the gender */
+        #gender {
+            text-transform: capitalize; /* Ensure 'Male' or 'Female' has first letter capitalized */
         }
 
         /* Responsive styling */
@@ -132,6 +132,10 @@
     </style>
 </head>
 <body>
+    <header>
+        <h1>Rabbit Profile</h1>
+        <input type="file" id="image-upload" accept="image/*" onchange="changeImage(event)">
+    </header>
     <div class="profile-card">
         <div class="profile-picture">
             <img id="profile-img" src="https://i.pinimg.com/564x/fd/2a/2c/fd2a2cdad94156e950fa549ac59e1655.jpg" alt="Rabbit Profile Picture">
@@ -152,87 +156,82 @@
         <div>
             <a href="index.html?cage=1" class="edit-details" id="edit-link">Edit Details</a>
         </div>
-        <!-- New Image Upload Section -->
-        <div class="upload-image">
-            <label for="imageUpload">Change Image:</label>
-            <input type="file" id="imageUpload" accept="image/*" onchange="changeImage(event)">
-        </div>
     </div>
 
-<script>
-window.onload = function() {
-    // Extract cage number from URL
-    const params = new URLSearchParams(window.location.search);
-    const cageNumber = params.get('cage') || 1;
+    <script>
+        window.onload = function() {
+            // Extract cage number from URL
+            const params = new URLSearchParams(window.location.search);
+            const cageNumber = params.get('cage') || 1;
 
-    // Load rabbit data from localStorage
-    const data = JSON.parse(localStorage.getItem(`rabbitData${cageNumber}`)) || {};
+            // Load rabbit data from localStorage
+            const data = JSON.parse(localStorage.getItem(`rabbitData${cageNumber}`)) || {};
 
-    // Update profile details
-    document.getElementById('breed').innerText = data.breed || 'Unknown';
-    document.getElementById('serial-no').innerText = data.serialNumber || 'Unknown';
-    document.getElementById('cage-no').innerText = cageNumber;
-    document.getElementById('age').innerText = calculateAge(data.birthDate) || 'Unknown';
-    document.getElementById('weight').innerText = data.weight || 'Unknown';
-    document.getElementById('family').innerText = data.family || 'Unknown';
-    document.getElementById('food-intake').innerText = data.foodIntake === "normal" ? "Normal" : "Irregular";
-    document.getElementById('pregnancy-start').innerText = data.pregnancyStart || 'Unknown';
-    document.getElementById('pregnancy-due').innerText = data.dueDate || 'Unknown';
-    document.getElementById('mating').innerText = data.mating === "yes" ? "Yes" : "No";
+            // Update profile details
+            document.getElementById('breed').innerText = data.breed || 'Unknown';
+            document.getElementById('serial-no').innerText = data.serialNumber || 'Unknown';
+            document.getElementById('cage-no').innerText = cageNumber;
+            document.getElementById('age').innerText = calculateAge(data.birthDate) || 'Unknown';
+            document.getElementById('weight').innerText = data.weight || 'Unknown';
+            document.getElementById('family').innerText = data.family || 'Unknown';
+            document.getElementById('food-intake').innerText = data.foodIntake === "normal" ? "Normal" : "Irregular";
+            document.getElementById('pregnancy-start').innerText = data.pregnancyStart || 'Unknown';
+            document.getElementById('pregnancy-due').innerText = data.dueDate || 'Unknown';
+            document.getElementById('mating').innerText = data.mating === "yes" ? "Yes" : "No";
 
-    // Determine and set gender from the index.html 'Gender' field
-    document.getElementById('gender').innerText = (data.gender || 'Unknown').toLowerCase().replace(/^\w/, c => c.toUpperCase());
+            // Determine and set gender from the index.html 'Gender' field
+            document.getElementById('gender').innerText = (data.gender || 'Unknown').toLowerCase().replace(/^\w/, c => c.toUpperCase());
 
-    // Update edit link dynamically to point to the correct cage number
-    document.getElementById('edit-link').href = `index.html?cage=${cageNumber}`;
+            // Load the image from local storage if available
+            const profileImg = document.getElementById('profile-img');
+            profileImg.src = data.image || profileImg.src; // Use the stored image or fallback to default
 
-    // Load the image from local storage if available
-    const profileImg = document.getElementById('profile-img');
-    profileImg.src = data.image || profileImg.src; // Use the stored image or fallback to default
-}
+            // Update edit link dynamically to point to the correct cage number
+            document.getElementById('edit-link').href = `index.html?cage=${cageNumber}`;
+        }
 
-// Function to calculate age from birth date
-function calculateAge(birthDate) {
-    if (!birthDate) return null;
-    const birth = new Date(birthDate);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const m = today.getMonth() - birth.getMonth();
+        // Function to calculate age from birth date
+        function calculateAge(birthDate) {
+            if (!birthDate) return null;
+            const birth = new Date(birthDate);
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const m = today.getMonth() - birth.getMonth();
 
-    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-        age--;
-    }
+            if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
 
-    // If age is less than 1 year, calculate months
-    if (age < 1) {
-        const months = (today.getFullYear() - birth.getFullYear()) * 12 + today.getMonth() - birth.getMonth();
-        return months + (months > 1 ? ' months' : ' month');
-    }
+            // If age is less than 1 year, calculate months
+            if (age < 1) {
+                const months = (today.getFullYear() - birth.getFullYear()) * 12 + today.getMonth() - birth.getMonth();
+                return months + (months > 1 ? ' months' : ' month');
+            }
 
-    return age + (age > 1 ? ' years' : ' year');
-}
+            return age + (age > 1 ? ' years' : ' year');
+        }
 
-// Function to change the profile image
-function changeImage(event) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
+        // Function to change the profile image
+        function changeImage(event) {
+            const file = event.target.files[0]; // Get the uploaded file
+            const reader = new FileReader(); // Create a FileReader instance
 
-    reader.onload = function(e) {
-        const profileImg = document.getElementById('profile-img');
-        profileImg.src = e.target.result; // Update the profile image
+            reader.onload = function(e) {
+                const profileImg = document.getElementById('profile-img');
+                profileImg.src = e.target.result; // Update the profile image with the Data URL
 
-        // Save the new image data URL to localStorage
-        const params = new URLSearchParams(window.location.search);
-        const cageNumber = params.get('cage') || 1;
-        const data = JSON.parse(localStorage.getItem(`rabbitData${cageNumber}`)) || {};
-        data.image = e.target.result; // Store the new image data URL
-        localStorage.setItem(`rabbitData${cageNumber}`, JSON.stringify(data));
-    };
+                // Save the new image data URL to localStorage
+                const params = new URLSearchParams(window.location.search);
+                const cageNumber = params.get('cage') || 1; // Get the cage number from URL
+                const data = JSON.parse(localStorage.getItem(`rabbitData${cageNumber}`)) || {}; // Load existing data or create new
+                data.image = e.target.result; // Store the new image Data URL
+                localStorage.setItem(`rabbitData${cageNumber}`, JSON.stringify(data)); // Save the updated data back to localStorage
+            };
 
-    if (file) {
-        reader.readAsDataURL(file); // Read the file as data URL
-    }
-}
-</script>
+            if (file) {
+                reader.readAsDataURL(file); // Read the file as Data URL
+            }
+        }
+    </script>
 </body>
 </html>
