@@ -94,9 +94,9 @@
             cursor: pointer;
         }
 
-        /* Style for capitalizing the gender */
-        #gender {
-            text-transform: capitalize; /* Ensure 'Male' or 'Female' has first letter capitalized */
+        /* New image upload styling */
+        .upload-image {
+            margin-top: 10px;
         }
 
         /* Responsive styling */
@@ -134,7 +134,7 @@
 <body>
     <div class="profile-card">
         <div class="profile-picture">
-            <img src="https://i.pinimg.com/564x/fd/2a/2c/fd2a2cdad94156e950fa549ac59e1655.jpg" alt="Rabbit Profile Picture">
+            <img id="profile-img" src="https://i.pinimg.com/564x/fd/2a/2c/fd2a2cdad94156e950fa549ac59e1655.jpg" alt="Rabbit Profile Picture">
         </div>
         <h2 id="breed">Breed</h2>
         <div class="profile-details">
@@ -152,9 +152,14 @@
         <div>
             <a href="index.html?cage=1" class="edit-details" id="edit-link">Edit Details</a>
         </div>
+        <!-- New Image Upload Section -->
+        <div class="upload-image">
+            <label for="imageUpload">Change Image:</label>
+            <input type="file" id="imageUpload" accept="image/*" onchange="changeImage(event)">
+        </div>
     </div>
 
-  <script>
+<script>
 window.onload = function() {
     // Extract cage number from URL
     const params = new URLSearchParams(window.location.search);
@@ -180,6 +185,10 @@ window.onload = function() {
 
     // Update edit link dynamically to point to the correct cage number
     document.getElementById('edit-link').href = `index.html?cage=${cageNumber}`;
+
+    // Load the image from local storage if available
+    const profileImg = document.getElementById('profile-img');
+    profileImg.src = data.image || profileImg.src; // Use the stored image or fallback to default
 }
 
 // Function to calculate age from birth date
@@ -201,6 +210,28 @@ function calculateAge(birthDate) {
     }
 
     return age + (age > 1 ? ' years' : ' year');
+}
+
+// Function to change the profile image
+function changeImage(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const profileImg = document.getElementById('profile-img');
+        profileImg.src = e.target.result; // Update the profile image
+
+        // Save the new image data URL to localStorage
+        const params = new URLSearchParams(window.location.search);
+        const cageNumber = params.get('cage') || 1;
+        const data = JSON.parse(localStorage.getItem(`rabbitData${cageNumber}`)) || {};
+        data.image = e.target.result; // Store the new image data URL
+        localStorage.setItem(`rabbitData${cageNumber}`, JSON.stringify(data));
+    };
+
+    if (file) {
+        reader.readAsDataURL(file); // Read the file as data URL
+    }
 }
 </script>
 </body>
