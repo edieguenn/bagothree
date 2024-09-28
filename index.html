@@ -82,6 +82,7 @@
                 <button type="submit">SUBMIT</button>
                 <button type="button" onclick="goHome()">CANCEL</button>
                 <button type="button" onclick="deleteCage()">DELETE CAGE</button>
+                <button type="button" onclick="clearForm()">CLEAR FORM</button> <!-- New Clear Form Button -->
             </div>
         </form>
     </div>
@@ -232,6 +233,12 @@
         });
         cages = newCages; // Update the cages reference
         localStorage.setItem('cages', JSON.stringify(cages)); // Update localStorage
+    }
+
+    function clearForm() {
+        document.getElementById('rabbitForm').reset(); // Reset the form
+        togglePregnancy(false); // Hide pregnancy options
+        togglePregnancyDetails(false); // Hide pregnancy details
     }
 </script>
 </body>
