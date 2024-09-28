@@ -1,5 +1,6 @@
 let totalCages = JSON.parse(localStorage.getItem('totalCages')) || 6;
 let addedCageCount = JSON.parse(localStorage.getItem('addedCageCount')) || 0;
+let nextCageId = JSON.parse(localStorage.getItem('nextCageId')) || 7;  // To keep track of unique cage IDs
 
 function goHome() {
     document.getElementById('homePage').style.display = 'block';
@@ -19,10 +20,10 @@ function showCageDetails(cageNumber) {
 }
 
 function addNewCage() {
+    const newCageId = nextCageId;  // Use nextCageId as the new unique ID for each cage
     totalCages++;
     addedCageCount++;
-    
-    const newCageId = totalCages;
+    nextCageId++;  // Increment nextCageId for future unique cages
 
     const cageButton = document.createElement('button');
     cageButton.textContent = `CAGE ${newCageId}`;
@@ -31,9 +32,52 @@ function addNewCage() {
 
     document.getElementById('cageButtons').appendChild(cageButton);
 
-    // Persist cage count and added cage count
+    // Persist total cages, added cage count, and next unique ID
     localStorage.setItem('totalCages', JSON.stringify(totalCages));
     localStorage.setItem('addedCageCount', JSON.stringify(addedCageCount));
+    localStorage.setItem('nextCageId', JSON.stringify(nextCageId));
 }
 
-function deleteCage
+function deleteCage() {
+    const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
+    if (confirm(`Are you sure you want to delete CAGE ${cageNumber}?`)) {
+        localStorage.removeItem(`rabbitData${cageNumber}`);
+
+        const buttonToDelete = document.querySelector(`button[data-id="${cageNumber}"]`);
+        if (buttonToDelete) {
+            buttonToDelete.remove();
+        }
+
+        // Only decrement totalCages if the deleted cage is dynamically added
+        if (parseInt(cageNumber) > 6) {
+            totalCages--;
+            addedCageCount--;
+            localStorage.setItem('totalCages', JSON.stringify(totalCages));
+            localStorage.setItem('addedCageCount', JSON.stringify(addedCageCount));
+        }
+
+        alert(`CAGE ${cageNumber} deleted.`);
+        goHome();
+    }
+}
+
+function updateCageList() {
+    const cageButtons = document.getElementById('cageButtons');
+    cageButtons.innerHTML = '';
+    for (let i = 1; i <= totalCages; i++) {
+        const cageButton = document.createElement('button');
+        cageButton.textContent = `CAGE ${i}`;
+        cageButton.setAttribute('data-id', i);
+        cageButton.onclick = function() { showCageDetails(i); };
+        cageButtons.appendChild(cageButton);
+    }
+}
+
+window.onload = function () {
+    let cageNumber = new URLSearchParams(window.location.search).get('cage');
+    if (cageNumber) {
+        showCageDetails(cageNumber);
+    } else {
+        goHome();
+    }
+}
