@@ -201,16 +201,21 @@
 
     function deleteCage() {
         const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
-        if (cages.hasOwnProperty(cageNumber)) {
+        if (cageNumber <= 6) { // Check if the cage number is between 1 and 6
+            // Just clear the stored data for that cage
+            localStorage.removeItem(`rabbitData${cageNumber}`);
+            alert(`Cage ${cageNumber} deleted successfully.`);
+            goHome(); // Go back to home
+        } else if (cages.hasOwnProperty(cageNumber)) {
+            // For dynamically added cages
             delete cages[cageNumber];
-            localStorage.removeItem(`rabbitData${cageNumber}`); // Remove rabbit data for this cage
             totalCages--;
             addedCageCount--;
             localStorage.setItem('totalCages', JSON.stringify(totalCages));
             localStorage.setItem('addedCageCount', JSON.stringify(addedCageCount));
             localStorage.setItem('cages', JSON.stringify(cages));
             alert(`Cage ${cageNumber} deleted successfully.`);
-            goHome();
+            goHome(); // Go back to home
         } else {
             alert('Cage cannot be deleted.');
         }
