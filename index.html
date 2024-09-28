@@ -97,7 +97,7 @@
         <button onclick="showCageDetails(4)">CAGE 4</button>
         <button onclick="showCageDetails(5)">CAGE 5</button>
         <button onclick="showCageDetails(6)">CAGE 6</button>
-        <button onclick="addNewCage()">ADD NEW CAGE</button> <!-- Add New Cage Button -->
+        <!-- Add New Cage Button Removed -->
     </div>
 
 <script>
@@ -197,25 +197,13 @@
             if (index !== -1) {
                 // Remove the button from the homePage
                 const buttons = document.querySelectorAll('#homePage button');
-                buttons[buttons.length - 2].remove(); // The second last button is always the new cage
+                buttons[buttons.length - 1].remove(); // Remove the last button, no "Add New Cage" button now
                 addedCages.splice(index, 1); // Remove it from addedCages list
             }
 
             alert(`Cage ${cageNumber} has been deleted.`);
             goHome();
         }
-    }
-
-    // Updated addNewCage function to keep track of added cages
-    function addNewCage() {
-        totalCages++;
-        addedCages.push(totalCages); // Track added cages
-
-        const homePage = document.getElementById('homePage');
-        const newCageButton = document.createElement('button');
-        newCageButton.textContent = `CAGE ${totalCages}`;
-        newCageButton.onclick = () => showCageDetails(totalCages);
-        homePage.insertBefore(newCageButton, homePage.lastElementChild);
     }
 
     window.onload = function () {
