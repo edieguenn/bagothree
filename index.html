@@ -194,12 +194,12 @@
     function updateCageList() {
         const cageButtonsDiv = document.getElementById('cageButtons');
         cageButtonsDiv.innerHTML = ''; // Clear existing buttons
-        Object.keys(cages).forEach(cageNumber => {
+        for (let cageNumber in cages) {
             const button = document.createElement('button');
-            button.innerHTML = `CAGE ${cageNumber}`;
+            button.innerText = `CAGE ${cageNumber}`;
             button.onclick = () => showCageDetails(cageNumber);
             cageButtonsDiv.appendChild(button);
-        });
+        }
     }
 
     function deleteCage() {
@@ -207,36 +207,22 @@
         if (confirm(`Are you sure you want to delete Cage ${cageNumber}?`)) {
             delete cages[cageNumber]; 
             localStorage.setItem('cages', JSON.stringify(cages)); 
+            localStorage.removeItem(`rabbitData${cageNumber}`); // Remove the associated data from localStorage
             alert(`Cage ${cageNumber} deleted successfully!`);
             
             // If the current cage is deleted, show the first available cage
-            if (!cages[cageNumber]) {
-                const remainingCages = Object.keys(cages);
-                if (remainingCages.length > 0) {
-                    const firstCageNumber = remainingCages[0]; // Get the first available cage
-                    showCageDetails(firstCageNumber);
-                } else {
-                    goHome(); // Go back to home if no cages left
-                }
+            const remainingCages = Object.keys(cages);
+            if (remainingCages.length > 0) {
+                const firstCageNumber = remainingCages[0]; // Get the first available cage
+                showCageDetails(firstCageNumber);
             } else {
-                renumberCages(); // Only renumber cages if the deleted cage is not currently displayed
-                updateCageList(); 
+                goHome(); // Go back to home if no cages left
             }
         }
     }
 
-    function renumberCages() {
-        let newCages = {};
-        let newId = 1;
-        Object.keys(cages).sort((a, b) => Number(a) - Number(b)).forEach(oldId => {
-            newCages[newId++] = cages[oldId]; // Assign new IDs starting from 1
-        });
-        cages = newCages; // Update the cages reference
-        localStorage.setItem('cages', JSON.stringify(cages)); // Update localStorage
-    }
-
     function clearForm() {
-        document.getElementById('rabbitForm').reset(); // Reset the form
+        document.getElementById('rabbitForm').reset(); // Reset the form fields
         togglePregnancy(false); // Hide pregnancy options
         togglePregnancyDetails(false); // Hide pregnancy details
     }
