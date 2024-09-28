@@ -15,7 +15,6 @@
 
     <div id="cageDetails">
         <form id="rabbitForm" onsubmit="saveData(event)">
-            <!-- Form Fields -->
             <div>
                 <label for="serialNumber">SERIAL NUMBER:</label>
                 <input type="text" id="serialNumber" name="serialNumber" required>
@@ -36,7 +35,7 @@
                 <label for="weight">WEIGHT:</label>
                 <input type="text" id="weight" name="weight">
             </div>
-            
+
             <!-- Gender Section -->
             <div>
                 <label for="gender">GENDER:</label>
@@ -86,35 +85,31 @@
             <div class="buttons">
                 <button type="submit">SUBMIT</button>
                 <button type="button" onclick="goHome()">CANCEL</button>
-                <button type="button" onclick="clearForm()">CLEAR FORM</button>
-                <button type="button" id="deleteButton" onclick="deleteCage()">DELETE CAGE</button>
+                <button type="button" onclick="deleteCage()">DELETE CAGE</button> <!-- Delete Cage Button -->
             </div>
         </form>
     </div>
 
     <div id="homePage" class="cage-list" style="display: none;">
-        <div id="cageButtons">
-            <button onclick="showCageDetails(1)" data-id="1">CAGE 1</button>
-            <button onclick="showCageDetails(2)" data-id="2">CAGE 2</button>
-            <button onclick="showCageDetails(3)" data-id="3">CAGE 3</button>
-            <button onclick="showCageDetails(4)" data-id="4">CAGE 4</button>
-            <button onclick="showCageDetails(5)" data-id="5">CAGE 5</button>
-            <button onclick="showCageDetails(6)" data-id="6">CAGE 6</button>
-        </div>
-        <button id="addCageBtn" onclick="addNewCage()">Add New Cage</button>
+        <button onclick="showCageDetails(1)">CAGE 1</button>
+        <button onclick="showCageDetails(2)">CAGE 2</button>
+        <button onclick="showCageDetails(3)">CAGE 3</button>
+        <button onclick="showCageDetails(4)">CAGE 4</button>
+        <button onclick="showCageDetails(5)">CAGE 5</button>
+        <button onclick="showCageDetails(6)">CAGE 6</button>
+        <button onclick="addNewCage()">ADD NEW CAGE</button> <!-- Add New Cage Button -->
     </div>
 
 <script>
-    let totalCages = 6;
-    let addedCageCount = 0;
+    let totalCages = 6; // Keeps track of the total number of cages
+    let addedCages = []; // To track dynamically added cages
 
     function goHome() {
         document.getElementById('homePage').style.display = 'block';
         document.getElementById('cageDetails').style.display = 'none';
         document.getElementById('pregnancyOption').style.display = 'none';
         document.getElementById('pregnancyDetails').style.display = 'none';
-        document.getElementById('headerTitle').innerHTML = '<strong>RABBIT CAGE</strong>';
-        updateCageList();
+        document.getElementById('headerTitle').innerHTML = '<strong>RABBIT CAGE</strong>'; // Reset header title
     }
 
     function showCageDetails(cageNumber) {
@@ -127,7 +122,7 @@
 
     function togglePregnancy(show) {
         document.getElementById('pregnancyOption').style.display = show ? 'block' : 'none';
-        document.getElementById('pregnancyDetails').style.display = 'none';
+        document.getElementById('pregnancyDetails').style.display = 'none'; // Hide pregnancy details if gender changes
     }
 
     function togglePregnancyDetails(show) {
@@ -191,47 +186,36 @@
         window.location.href = `rabbitinfo.html?cage=${cageNumber}&${params.toString()}`;
     }
 
-    function clearForm() {
-        if (confirm('Are you sure you want to clear the form? This will reset all fields.')) {
-            document.getElementById('rabbitForm').reset();
-        }
-    }
-
-    function addNewCage() {
-        totalCages++;  // Increment total cage count for new cages
-        const newCageId = totalCages;  // Use totalCages as the new unique ID for each cage
-        
-        const cageButton = document.createElement('button');
-        cageButton.textContent = `CAGE ${newCageId}`;
-        cageButton.setAttribute('data-id', newCageId);  // Assign unique ID to the new cage
-        cageButton.onclick = function() { showCageDetails(newCageId); };
-        
-        document.getElementById('cageButtons').appendChild(cageButton);
-    }
-
+    // Updated deleteCage function
     function deleteCage() {
         const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
-        if (confirm(`Are you sure you want to delete CAGE ${cageNumber}?`)) {
+        if (confirm(`Are you sure you want to delete Cage ${cageNumber}?`)) {
             localStorage.removeItem(`rabbitData${cageNumber}`);
-            const buttonToDelete = document.querySelector(`button[data-id="${cageNumber}"]`);
-            if (buttonToDelete) {
-                buttonToDelete.remove();
+
+            // Check if it's a dynamically added cage
+            const index = addedCages.indexOf(parseInt(cageNumber));
+            if (index !== -1) {
+                // Remove the button from the homePage
+                const buttons = document.querySelectorAll('#homePage button');
+                buttons[buttons.length - 2].remove(); // The second last button is always the new cage
+                addedCages.splice(index, 1); // Remove it from addedCages list
             }
-            alert(`CAGE ${cageNumber} deleted.`);
+
+            alert(`Cage ${cageNumber} has been deleted.`);
             goHome();
         }
     }
 
-    function updateCageList() {
-        const cageButtons = document.getElementById('cageButtons');
-        cageButtons.innerHTML = '';
-        for (let i = 1; i <= totalCages; i++) {
-            const cageButton = document.createElement('button');
-            cageButton.textContent = `CAGE ${i}`;
-            cageButton.setAttribute('data-id', i);  // Ensure all cages have a unique data-id
-            cageButton.onclick = function() { showCageDetails(i); };
-            cageButtons.appendChild(cageButton);
-        }
+    // Updated addNewCage function to keep track of added cages
+    function addNewCage() {
+        totalCages++;
+        addedCages.push(totalCages); // Track added cages
+
+        const homePage = document.getElementById('homePage');
+        const newCageButton = document.createElement('button');
+        newCageButton.textContent = `CAGE ${totalCages}`;
+        newCageButton.onclick = () => showCageDetails(totalCages);
+        homePage.insertBefore(newCageButton, homePage.lastElementChild);
     }
 
     window.onload = function () {
