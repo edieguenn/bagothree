@@ -78,18 +78,11 @@
                 <textarea id="note" name="note"></textarea>
             </div>
 
-            <!-- New Image Upload Section -->
-            <div>
-                <label for="rabbitImage">UPLOAD RABBIT IMAGE:</label>
-                <input type="file" id="rabbitImage" accept="image/*" onchange="previewImage(event)">
-                <img id="imagePreview" style="display:none;" alt="Image Preview" width="300">
-            </div>
-
             <div class="buttons">
                 <button type="submit">SUBMIT</button>
                 <button type="button" onclick="goHome()">CANCEL</button>
                 <button type="button" onclick="deleteCage()">DELETE CAGE</button>
-                <button type="button" onclick="clearForm()">CLEAR FORM</button>
+                <button type="button" onclick="clearForm()">CLEAR FORM</button> <!-- New Clear Form Button -->
             </div>
         </form>
     </div>
@@ -185,11 +178,6 @@
         document.querySelector(`input[name="foodIntake"][value="${data.foodIntake || 'normal'}"]`).checked = true;
         document.querySelector(`input[name="mating"][value="${data.mating || 'no'}"]`).checked = true;
         document.getElementById('note').value = data.note || '';
-
-        // Load image preview if it exists
-        const imgPreview = document.getElementById('imagePreview');
-        imgPreview.src = data.image || ''; // Assuming you store the image URL in localStorage
-        imgPreview.style.display = data.image ? 'block' : 'none';
     }
 
     function goToRabbitProfile() {
@@ -251,24 +239,6 @@
         document.getElementById('rabbitForm').reset(); // Reset the form
         togglePregnancy(false); // Hide pregnancy options
         togglePregnancyDetails(false); // Hide pregnancy details
-        document.getElementById('imagePreview').style.display = 'none'; // Hide image preview
-    }
-
-    function previewImage(event) {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const imgPreview = document.getElementById('imagePreview');
-            imgPreview.src = e.target.result;
-            imgPreview.style.display = 'block';
-
-            // Save the image data URL to localStorage
-            const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
-            const data = JSON.parse(localStorage.getItem(`rabbitData${cageNumber}`)) || {};
-            data.image = e.target.result; // Store the image data URL
-            localStorage.setItem(`rabbitData${cageNumber}`, JSON.stringify(data));
-        };
-        reader.readAsDataURL(file);
     }
 </script>
 </body>
