@@ -189,16 +189,15 @@
     // Updated deleteCage function
     function deleteCage() {
         const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
-        if (confirm(`Are you sure you want to delete Cage ${cageNumber}?`)) {
+        if (confirm(`Are you sure you want to delete Cage ${cageNumber}? This will delete all data for this cage.`)) {
             localStorage.removeItem(`rabbitData${cageNumber}`);
 
-            // Check if it's a dynamically added cage
+            // Remove the cage button from the homepage (if dynamically added)
             const index = addedCages.indexOf(parseInt(cageNumber));
             if (index !== -1) {
-                // Remove the button from the homePage
                 const buttons = document.querySelectorAll('#homePage button');
-                buttons[buttons.length - 1].remove(); // Remove the last button, no "Add New Cage" button now
-                addedCages.splice(index, 1); // Remove it from addedCages list
+                buttons[buttons.length - 1].remove(); // Remove the last added cage button
+                addedCages.splice(index, 1); // Remove it from the addedCages list
             }
 
             alert(`Cage ${cageNumber} has been deleted.`);
