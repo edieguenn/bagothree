@@ -92,7 +92,6 @@
     </div>
 
 <script>
-    let totalCages = JSON.parse(localStorage.getItem('totalCages')) || 6;
     let cages = JSON.parse(localStorage.getItem('cages')) || {}; // Store dynamically added cages
 
     function goHome() {
@@ -102,6 +101,19 @@
         document.getElementById('pregnancyDetails').style.display = 'none';
         document.getElementById('headerTitle').innerHTML = '<strong>RABBIT CAGE</strong>';
         updateCageList();
+    }
+
+    function addNewCage() {
+        // Determine the next available cage ID starting from 1
+        let newCageId = 1;
+        while (cages[newCageId] !== undefined) {
+            newCageId++;
+        }
+        cages[newCageId] = {}; 
+        localStorage.setItem('cages', JSON.stringify(cages)); 
+        updateCageList(); 
+        document.getElementById('headerTitle').innerHTML = `<strong>CAGE ${newCageId}</strong>`; // Update the header
+        showCageDetails(newCageId); // Show the new cage details immediately
     }
 
     function showCageDetails(cageNumber) {
@@ -176,15 +188,6 @@
             params.append(key, value);
         });
         window.location.href = `rabbitinfo.html?cage=${cageNumber}&${params.toString()}`;
-    }
-
-    function addNewCage() {
-        let newCageId = Object.keys(cages).length > 0 ? Math.max(...Object.keys(cages).map(Number)) + 1 : 1; // Determine the next cage ID
-        cages[newCageId] = {}; 
-        localStorage.setItem('cages', JSON.stringify(cages)); 
-        updateCageList(); 
-        document.getElementById('headerTitle').innerHTML = `<strong>CAGE ${newCageId}</strong>`; // Update the header
-        showCageDetails(newCageId); // Show the new cage details immediately
     }
 
     function updateCageList() {
