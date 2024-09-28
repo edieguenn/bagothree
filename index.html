@@ -15,6 +15,7 @@
 
     <div id="cageDetails">
         <form id="rabbitForm" onsubmit="saveData(event)">
+            <!-- Form Fields -->
             <div>
                 <label for="serialNumber">SERIAL NUMBER:</label>
                 <input type="text" id="serialNumber" name="serialNumber" required>
@@ -35,7 +36,7 @@
                 <label for="weight">WEIGHT:</label>
                 <input type="text" id="weight" name="weight">
             </div>
-
+            
             <!-- Gender Section -->
             <div>
                 <label for="gender">GENDER:</label>
@@ -85,31 +86,35 @@
             <div class="buttons">
                 <button type="submit">SUBMIT</button>
                 <button type="button" onclick="goHome()">CANCEL</button>
-                <button type="button" onclick="clearForm()">CLEAR FORM</button> <!-- Renamed Button -->
+                <button type="button" onclick="clearForm()">CLEAR FORM</button>
+                <button type="button" onclick="deleteCage()">DELETE CAGE</button>
             </div>
         </form>
     </div>
 
     <div id="homePage" class="cage-list" style="display: none;">
-        <button onclick="showCageDetails(1)">CAGE 1</button>
-        <button onclick="showCageDetails(2)">CAGE 2</button>
-        <button onclick="showCageDetails(3)">CAGE 3</button>
-        <button onclick="showCageDetails(4)">CAGE 4</button>
-        <button onclick="showCageDetails(5)">CAGE 5</button>
-        <button onclick="showCageDetails(6)">CAGE 6</button>
-        <!-- Add New Cage Button Removed -->
+        <div id="cageButtons">
+            <button onclick="showCageDetails(1)">CAGE 1</button>
+            <button onclick="showCageDetails(2)">CAGE 2</button>
+            <button onclick="showCageDetails(3)">CAGE 3</button>
+            <button onclick="showCageDetails(4)">CAGE 4</button>
+            <button onclick="showCageDetails(5)">CAGE 5</button>
+            <button onclick="showCageDetails(6)">CAGE 6</button>
+        </div>
+        <button id="addCageBtn" onclick="addNewCage()">Add New Cage</button>
     </div>
 
 <script>
-    let totalCages = 6; // Keeps track of the total number of cages
-    let addedCages = []; // To track dynamically added cages
+    let totalCages = 6;
+    let addedCages = [];
 
     function goHome() {
         document.getElementById('homePage').style.display = 'block';
         document.getElementById('cageDetails').style.display = 'none';
         document.getElementById('pregnancyOption').style.display = 'none';
         document.getElementById('pregnancyDetails').style.display = 'none';
-        document.getElementById('headerTitle').innerHTML = '<strong>RABBIT CAGE</strong>'; // Reset header title
+        document.getElementById('headerTitle').innerHTML = '<strong>RABBIT CAGE</strong>';
+        updateCageList();
     }
 
     function showCageDetails(cageNumber) {
@@ -122,7 +127,7 @@
 
     function togglePregnancy(show) {
         document.getElementById('pregnancyOption').style.display = show ? 'block' : 'none';
-        document.getElementById('pregnancyDetails').style.display = 'none'; // Hide pregnancy details if gender changes
+        document.getElementById('pregnancyDetails').style.display = 'none';
     }
 
     function togglePregnancyDetails(show) {
@@ -186,10 +191,39 @@
         window.location.href = `rabbitinfo.html?cage=${cageNumber}&${params.toString()}`;
     }
 
-    // Clear Form function
     function clearForm() {
         if (confirm('Are you sure you want to clear the form? This will reset all fields.')) {
             document.getElementById('rabbitForm').reset();
+        }
+    }
+
+    function addNewCage() {
+        totalCages++;
+        const cageButton = document.createElement('button');
+        cageButton.textContent = `CAGE ${totalCages}`;
+        cageButton.onclick = function() { showCageDetails(totalCages); };
+        document.getElementById('cageButtons').appendChild(cageButton);
+        addedCages.push(totalCages);
+    }
+
+    function deleteCage() {
+        const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
+        if (confirm(`Are you sure you want to delete CAGE ${cageNumber}?`)) {
+            localStorage.removeItem(`rabbitData${cageNumber}`);
+            alert(`CAGE ${cageNumber} deleted.`);
+            goHome();
+        }
+    }
+
+    function updateCageList() {
+        // Update the list of cages based on dynamically added cages
+        const cageButtons = document.getElementById('cageButtons');
+        cageButtons.innerHTML = '';
+        for (let i = 1; i <= totalCages; i++) {
+            const cageButton = document.createElement('button');
+            cageButton.textContent = `CAGE ${i}`;
+            cageButton.onclick = function() { showCageDetails(i); };
+            cageButtons.appendChild(cageButton);
         }
     }
 
