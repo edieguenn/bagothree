@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rabbit Cage</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <button onclick="goHome()">&#x1F3E0;</button> 
+        <span id="headerTitle">Rabbit Cage</span>
+        <button onclick="goToRabbitProfile()">&#x1F407;</button>
+    </header>
+
+    <div id="cageDetails">
+        <form id="rabbitForm" onsubmit="saveData(event)">
+            <div>
+                <label for="serialNumber">SERIAL NUMBER:</label>
+                <input type="text" id="serialNumber" name="serialNumber" required>
+            </div>
+            <div>
+                <label for="breed">BREED:</label>
+                <input type="text" id="breed" name="breed">
+            </div>
+            <div>
+                <label for="family">FAMILY:</label>
+                <input type="text" id="family" name="family">
+            </div>
+            <div>
+                <label for="birthDate">DATE OF BIRTH:</label>
+                <input type="date" id="birthDate" name="birthDate">
+            </div>
+            <div>
+                <label for="weight">WEIGHT:</label>
+                <input type="text" id="weight" name="weight">
+            </div>
+
+            <!-- Gender Section -->
+            <div>
+                <label for="gender">GENDER:</label>
+                <label><input type="radio" name="gender" value="male" onclick="togglePregnancy(false)"> MALE</label>
+                <label><input type="radio" name="gender" value="female" onclick="togglePregnancy(true)"> FEMALE</label>
+            </div>
+
+            <!-- Pregnant Option (only for Female) -->
+            <div id="pregnancyOption" style="display: none;">
+                <label>PREGNANT:</label>
+                <label><input type="radio" name="pregnant" value="yes" onclick="togglePregnancyDetails(true)"> YES</label>
+                <label><input type="radio" name="pregnant" value="no" onclick="togglePregnancyDetails(false)"> NO</label>
+            </div>
+
+            <!-- Pregnancy Details (shown if Pregnant is Yes) -->
+            <div id="pregnancyDetails" style="display: none;">
+                <div>
+                    <label for="matedRabbit">MATED RABBIT:</label>
+                    <input type="text" id="matedRabbit" name="matedRabbit">
+                </div>
+                <div>
+                    <label for="pregnancyStart">START OF PREGNANCY:</label>
+                    <input type="date" id="pregnancyStart" name="pregnancyStart">
+                </div>
+                <div>
+                    <label for="dueDate">DUE DATE OF PREGNANCY:</label>
+                    <input type="date" id="dueDate" name="dueDate">
+                </div>
+            </div>
+
+            <!-- Other Fields -->
+            <div>
+                <label for="foodIntake">FOOD INTAKE:</label>
+                <label><input type="radio" name="foodIntake" value="normal"> NORMAL</label>
+                <label><input type="radio" name="foodIntake" value="irregular"> IRREGULAR</label>
+            </div>
+            <div>
+                <label>ELIGIBLE FOR MATING:</label>
+                <label><input type="radio" name="mating" value="yes"> YES</label>
+                <label><input type="radio" name="mating" value="no"> NO</label>
+            </div>
+            <div>
+                <label for="note">NOTE:</label>
+                <textarea id="note" name="note"></textarea>
+            </div>
+
+            <div class="buttons">
+                <button type="submit">SUBMIT</button>
+                <button type="button" onclick="goHome()">CANCEL</button>
+                <button type="button" onclick="deleteCage()">DELETE CAGE</button> <!-- Delete Cage Button -->
+            </div>
+        </form>
+    </div>
+
+    <div id="homePage" class="cage-list" style="display: none;">
+        <button onclick="showCageDetails(1)">CAGE 1</button>
+        <button onclick="showCageDetails(2)">CAGE 2</button>
+        <button onclick="showCageDetails(3)">CAGE 3</button>
+        <button onclick="showCageDetails(4)">CAGE 4</button>
+        <button onclick="showCageDetails(5)">CAGE 5</button>
+        <button onclick="showCageDetails(6)">CAGE 6</button>
+        <button onclick="addNewCage()">ADD NEW CAGE</button> <!-- Add New Cage Button -->
+    </div>
+
+<script>
+    let totalCages = 6; // Keeps track of the total number of cages
+    let addedCages = []; // To track dynamically added cages
+
+    function goHome() {
+        document.getElementById('homePage').style.display = 'block';
+        document.getElementById('cageDetails').style.display = 'none';
+        document.getElementById('pregnancyOption').style.display = 'none';
+        document.getElementById('pregnancyDetails').style.display = 'none';
+        document.getElementById('headerTitle').innerHTML = '<strong>RABBIT CAGE</strong>'; // Reset header title
+    }
+
+    function showCageDetails(cageNumber) {
+        document.getElementById('homePage').style.display = 'none';
+        document.getElementById('cageDetails').style.display = 'block';
+        loadData(cageNumber);
+        document.getElementById('rabbitForm').dataset.cageNumber = cageNumber;
+        document.getElementById('headerTitle').innerHTML = `<strong>CAGE ${cageNumber}</strong>`;
+    }
+
+    function togglePregnancy(show) {
+        document.getElementById('pregnancyOption').style.display = show ? 'block' : 'none';
+        document.getElementById('pregnancyDetails').style.display = 'none'; // Hide pregnancy details if gender changes
+    }
+
+    function togglePregnancyDetails(show) {
+        document.getElementById('pregnancyDetails').style.display = show ? 'block' : 'none';
+    }
+
+    function saveData(event) {
+        event.preventDefault();
+        const form = document.getElementById('rabbitForm');
+        const cageNumber = form.dataset.cageNumber;
+        const data = new FormData(form);
+        const obj = {};
+        data.forEach((value, key) => {
+            obj[key] = value;
+        });
+        localStorage.setItem(`rabbitData${cageNumber}`, JSON.stringify(obj));
+        alert('Data saved successfully!');
+        goToRabbitProfile();
+    }
+
+    function loadData(cageNumber) {
+        let data = JSON.parse(localStorage.getItem(`rabbitData${cageNumber}`)) || {};
+        document.getElementById('serialNumber').value = data.serialNumber || '';
+        document.getElementById('breed').value = data.breed || '';
+        document.getElementById('family').value = data.family || '';
+        document.getElementById('birthDate').value = data.birthDate || '';
+        document.getElementById('weight').value = data.weight || '';
+        
+        if (data.gender === "female") {
+            document.querySelector('input[name="gender"][value="female"]').checked = true;
+            togglePregnancy(true);
+        } else {
+            document.querySelector('input[name="gender"][value="male"]').checked = true;
+            togglePregnancy(false);
+        }
+
+        if (data.pregnant === "yes") {
+            document.querySelector('input[name="pregnant"][value="yes"]').checked = true;
+            togglePregnancyDetails(true);
+        } else {
+            document.querySelector('input[name="pregnant"][value="no"]').checked = true;
+            togglePregnancyDetails(false);
+        }
+
+        document.getElementById('matedRabbit').value = data.matedRabbit || '';
+        document.getElementById('pregnancyStart').value = data.pregnancyStart || '';
+        document.getElementById('dueDate').value = data.dueDate || '';
+        document.querySelector(`input[name="foodIntake"][value="${data.foodIntake || 'normal'}"]`).checked = true;
+        document.querySelector(`input[name="mating"][value="${data.mating || 'no'}"]`).checked = true;
+        document.getElementById('note').value = data.note || '';
+    }
+
+    function goToRabbitProfile() {
+        const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber || 1;
+        const form = document.getElementById('rabbitForm');
+        const data = new FormData(form);
+        const params = new URLSearchParams();
+        data.forEach((value, key) => {
+            params.append(key, value);
+        });
+        window.location.href = `rabbitinfo.html?cage=${cageNumber}&${params.toString()}`;
+    }
+
+    // Updated deleteCage function
+    function deleteCage() {
+        const cageNumber = document.getElementById('rabbitForm').dataset.cageNumber;
+        if (confirm(`Are you sure you want to delete Cage ${cageNumber}?`)) {
+            localStorage.removeItem(`rabbitData${cageNumber}`);
+
+            // Check if it's a dynamically added cage
+            const index = addedCages.indexOf(parseInt(cageNumber));
+            if (index !== -1) {
+                // Remove the button from the homePage
+                const buttons = document.querySelectorAll('#homePage button');
+                buttons[buttons.length - 2].remove(); // The second last button is always the new cage
+                addedCages.splice(index, 1); // Remove it from addedCages list
+            }
+
+            alert(`Cage ${cageNumber} has been deleted.`);
+            goHome();
+        }
+    }
+
+    // Updated addNewCage function to keep track of added cages
+    function addNewCage() {
+        totalCages++;
+        addedCages.push(totalCages); // Track added cages
+
+        const homePage = document.getElementById('homePage');
+        const newCageButton = document.createElement('button');
+        newCageButton.textContent = `CAGE ${totalCages}`;
+        newCageButton.onclick = () => showCageDetails(totalCages);
+        homePage.insertBefore(newCageButton, homePage.lastElementChild);
+    }
+
+    window.onload = function () {
+        let cageNumber = new URLSearchParams(window.location.search).get('cage');
+        if (cageNumber) {
+            showCageDetails(cageNumber);
+        } else {
+            goHome();
+        }
+    }
+</script>
+</body>
+</html>
